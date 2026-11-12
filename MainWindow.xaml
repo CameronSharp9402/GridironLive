@@ -1,0 +1,1044 @@
+﻿<Window x:Class="GridironLive.MainWindow"
+        xmlns:controls="clr-namespace:GridironLive.Controls"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GridironLive"
+        Height="1000"
+        Width="1450"
+        MinHeight="1000"
+        MinWidth="1050"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
+
+
+    <Window.Resources>
+        
+        <!-- GAME SELECTOR -->
+        <Style x:Key="GameSelectorStyle"
+       TargetType="{x:Type ComboBox}">
+
+            <Setter Property="Background" Value="#20232D"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#343846"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="MaxDropDownHeight" Value="350"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+
+            <!-- Dropdown items -->
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="{x:Type ComboBoxItem}">
+                        <Setter Property="Background" Value="#20232D"/>
+                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#343B4D"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#2D3547"/>
+                                <Setter Property="Foreground" Value="#C4B5FD"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+
+            <!-- CUSTOM COMBOBOX TEMPLATE -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+
+                            <!-- Main selector -->
+                            <ToggleButton
+                        x:Name="DropDownToggle"
+                        Focusable="False"
+                        IsChecked="{Binding IsDropDownOpen,
+                            RelativeSource={RelativeSource TemplatedParent},
+                            Mode=TwoWay}"
+                        ClickMode="Press">
+
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border
+                                    x:Name="ToggleBorder"
+                                    Background="#20232D"
+                                    BorderBrush="#343846"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="32"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Selected game -->
+                                                <ContentPresenter
+                                            Grid.Column="0"
+                                            Content="{Binding SelectionBoxItem,
+                                                RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
+                                            ContentTemplate="{Binding SelectionBoxItemTemplate,
+                                                RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
+                                            ContentStringFormat="{Binding SelectionBoxItemStringFormat,
+                                                RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
+                                            Margin="10,6,0,6"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Stretch"
+                                            RecognizesAccessKey="True"/>
+
+                                                <!-- Dropdown arrow -->
+                                                <Path
+                                            Grid.Column="1"
+                                            Data="M 0 0 L 4 4 L 8 0"
+                                            Stroke="#85899A"
+                                            StrokeThickness="1.5"
+                                            StrokeLineJoin="Round"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ToggleBorder"
+                                                Property="BorderBrush"
+                                                Value="#8B7BC8"/>
+                                            </Trigger>
+
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="ToggleBorder"
+                                                Property="Background"
+                                                Value="#2D3547"/>
+                                            </Trigger>
+
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter TargetName="ToggleBorder"
+                                                Property="Opacity"
+                                                Value="0.5"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- Dropdown -->
+                            <Popup
+                        x:Name="PART_Popup"
+                        Placement="Bottom"
+                        PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        IsOpen="{TemplateBinding IsDropDownOpen}"
+                        AllowsTransparency="True"
+                        Focusable="False"
+                        PopupAnimation="Fade">
+
+                                <Border
+                            Background="#20232D"
+                            BorderBrush="#343846"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="4"
+                            MinWidth="{Binding ActualWidth,
+                                RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}">
+
+                                    <ScrollViewer
+                                MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                CanContentScroll="True"
+                                SnapsToDevicePixels="True"
+                                VerticalScrollBarVisibility="Auto"
+                                HorizontalScrollBarVisibility="Disabled">
+
+                                        <ItemsPresenter
+                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+        <!-- GAME SELECTOR POPUP BACKGROUND -->
+        <Style x:Key="GameSelectorPopupBorder"
+               TargetType="{x:Type Border}">
+
+            <Setter Property="Background" Value="#20232D"/>
+            <Setter Property="BorderBrush" Value="#343846"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="4"/>
+
+        </Style>
+
+        <!-- MODERN DARK SCROLLBAR -->
+        <Style x:Key="DarkScrollBar"
+               TargetType="{x:Type ScrollBar}">
+
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="MinWidth" Value="10"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+
+                        <Grid Background="Transparent">
+
+                            <!-- SUBTLE TRACK BACKGROUND -->
+                            <Border
+                                Background="#292C38"
+                                CornerRadius="5"
+                                Margin="1,1,1,1"/>
+
+                            <!-- SCROLL TRACK -->
+                            <Track x:Name="PART_Track"
+                                   Orientation="{TemplateBinding Orientation}"
+                                   IsDirectionReversed="True"
+                                   Minimum="{TemplateBinding Minimum}"
+                                   Maximum="{TemplateBinding Maximum}"
+                                   Value="{TemplateBinding Value}"
+                                   ViewportSize="{TemplateBinding ViewportSize}">
+
+                                <!-- SCROLL THUMB -->
+                                <Track.Thumb>
+
+                                    <Thumb>
+
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+
+                                                <Border
+                                                    x:Name="ThumbBorder"
+                                                    Background="#414653"
+                                                    CornerRadius="5"
+                                                    Margin="2,1"
+                                                    SnapsToDevicePixels="True"/>
+
+                                                <ControlTemplate.Triggers>
+
+                                                    <!-- Hover -->
+                                                    <Trigger Property="IsMouseOver"
+                                                             Value="True">
+
+                                                        <Setter
+                                                            TargetName="ThumbBorder"
+                                                            Property="Background"
+                                                            Value="#8B7BC8"/>
+
+                                                    </Trigger>
+
+                                                    <!-- Dragging -->
+                                                    <Trigger Property="IsDragging"
+                                                             Value="True">
+
+                                                        <Setter
+                                                            TargetName="ThumbBorder"
+                                                            Property="Background"
+                                                            Value="#A78BFA"/>
+
+                                                    </Trigger>
+
+                                                </ControlTemplate.Triggers>
+
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+
+                                    </Thumb>
+
+                                </Track.Thumb>
+
+                            </Track>
+
+                        </Grid>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="22">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <Border Background="{StaticResource AccentBrush}"
+                        CornerRadius="9"
+                        Width="38"
+                        Height="38"
+                        Margin="0,0,12,0">
+                    <TextBlock Text="G"
+                               FontSize="23"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="GRIDIRONLIVE"
+                               FontSize="20"
+                               FontWeight="Bold"/>
+
+                    <TextBlock Text="NFL LIVE CENTER"
+                               FontSize="10"
+                               Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+
+                <Ellipse Width="8"
+                         Height="8"
+                         Fill="{StaticResource GreenBrush}"
+                         Margin="0,0,8,0"/>
+
+                <TextBlock Text="SYSTEM READY"
+                           Foreground="{StaticResource MutedBrush}"
+                           FontSize="11"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- GAME SELECTOR -->
+        <Border Grid.Row="1"
+                Background="{StaticResource PanelBrush}"
+                CornerRadius="10"
+                Padding="15"
+                Margin="0,5,0,15">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="GAMES"
+                           FontWeight="Bold"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           Margin="0,0,20,0"/>
+
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Games}"
+                          SelectedItem="{Binding SelectedGame}"
+                          Background="#20232D"
+                          Foreground="{StaticResource TextBrush}"
+                          BorderBrush="{StaticResource BorderBrush}"
+                          Style="{StaticResource GameSelectorStyle}">
+
+                    <ComboBox.Resources>
+                        <!-- SELECTED GAME DISPLAY -->
+                        <DataTemplate x:Key="SelectedGameTemplate">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- AWAY TEAM -->
+                                <StackPanel Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+
+                                    <Image Source="{Binding AwayTeam.LogoUrl}"
+                                           Width="28"
+                                           Height="28"
+                                           Stretch="Uniform"
+                                           Margin="0,0,8,0"/>
+
+                                    <TextBlock Text="{Binding AwayTeam.Abbreviation}"
+                                               Foreground="#FFFFFF"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- MATCHUP -->
+                                <TextBlock Grid.Column="1"
+                                           Text="VS"
+                                           Foreground="#85899A"
+                                           FontSize="10"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+
+                                <!-- HOME TEAM -->
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+
+                                    <TextBlock Text="{Binding HomeTeam.Abbreviation}"
+                                               Foreground="#FFFFFF"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+
+                                    <Image Source="{Binding HomeTeam.LogoUrl}"
+                                           Width="28"
+                                           Height="28"
+                                           Stretch="Uniform"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.Resources>
+
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- AWAY TEAM -->
+                                <StackPanel Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+
+                                    <Image Source="{Binding AwayTeam.LogoUrl}"
+                                           Width="28"
+                                           Height="28"
+                                           Stretch="Uniform"
+                                           Margin="0,0,8,0"/>
+
+                                    <TextBlock Text="{Binding AwayTeam.Abbreviation}"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- MATCHUP -->
+                                <TextBlock Grid.Column="1"
+                                           Text="VS"
+                                           Foreground="{StaticResource MutedBrush}"
+                                           FontSize="10"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+
+                                <!-- HOME TEAM -->
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+
+                                    <TextBlock Text="{Binding HomeTeam.Abbreviation}"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+
+                                    <Image Source="{Binding HomeTeam.LogoUrl}"
+                                           Width="28"
+                                           Height="28"
+                                           Stretch="Uniform"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                    <Button Grid.Column="2"
+                        Content="Refresh"
+                        Click="Refresh_Click"
+                        Style="{StaticResource DashboardButton}"/>
+            </Grid>
+        </Border>
+
+        <!-- SCOREBOARD -->
+        <Border Grid.Row="2"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="20"
+                Margin="0,0,0,6">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- AWAY TEAM -->
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+
+                    <TextBlock Text="AWAY"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"
+                               HorizontalAlignment="Center"/>
+
+                    <Image Source="{Binding SelectedGame.AwayTeam.LogoUrl}"
+                           Width="58"
+                           Height="58"
+                           Stretch="Uniform"
+                           Margin="0,8,0,8"/>
+
+                    <TextBlock Text="{Binding SelectedGame.AwayTeam.Abbreviation, FallbackValue=TBD, TargetNullValue=TBD}"
+                               FontSize="32"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="{Binding SelectedGame.AwayTeam.DisplayName, FallbackValue=Away Team, TargetNullValue=Away Team}"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- SCORE -->
+                <StackPanel Grid.Column="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Margin="35,0">
+
+                    <TextBlock Text="VS"
+                               FontSize="11"
+                               Foreground="{StaticResource MutedBrush}"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="{Binding SelectedGame.DisplayScore, FallbackValue=-- : --}"
+                               FontSize="38"
+                               FontWeight="Bold"
+                               Margin="0,5"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="{Binding SelectedGame.StatusDetail, FallbackValue=Select a game}"
+                               FontSize="11"
+                               Foreground="{StaticResource MutedBrush}"
+                               HorizontalAlignment="Center"/>
+
+                </StackPanel>
+
+                <!-- HOME TEAM -->
+                <StackPanel Grid.Column="2"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+
+                    <TextBlock Text="HOME"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"
+                               HorizontalAlignment="Center"/>
+
+                    <Image Source="{Binding SelectedGame.HomeTeam.LogoUrl}"
+                           Width="58"
+                           Height="58"
+                           Stretch="Uniform"
+                           Margin="0,8,0,8"/>
+
+                    <TextBlock Text="{Binding SelectedGame.HomeTeam.Abbreviation, FallbackValue=TBD, TargetNullValue=TBD}"
+                               FontSize="32"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="{Binding SelectedGame.HomeTeam.DisplayName, FallbackValue=Home Team, TargetNullValue=Home Team}"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.1*"/>
+                <ColumnDefinition Width="0.9*"/>
+            </Grid.ColumnDefinitions>
+
+
+            <!-- PLAY BY PLAY -->
+            <Border Background="{StaticResource PanelBrush}"
+                    CornerRadius="12"
+                    Padding="18"
+                    Margin="0,0,12,0">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="190"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- PLAY BY PLAY STATUS -->
+                    <TextBlock
+                        Grid.Row="0"
+                        Text="{Binding PlayByPlayStatus}"
+                        Foreground="{StaticResource MutedBrush}"
+                        FontSize="11"
+                        Margin="0,0,0,12"/>
+
+                    <!-- FOOTBALL FIELD -->
+                    <controls:FootballField
+                        Grid.Row="1"
+                        Margin="0,0,0,12"
+                        PossessionTeam="{Binding GameSituation.PossessionTeam}"
+                        FieldPosition="{Binding GameSituation.FieldPosition}"
+                        YardLine="{Binding GameSituation.YardLine}"
+                        AwayTeam="{Binding SelectedGame.AwayTeam.Abbreviation}"
+                        HomeTeam="{Binding SelectedGame.HomeTeam.Abbreviation}"
+                        Down="{Binding GameSituation.Down}"
+                        Distance="{Binding GameSituation.Distance}"/>
+
+                    <!-- PLAY TIMELINE -->
+                    <ScrollViewer
+                        Grid.Row="2"
+                        VerticalScrollBarVisibility="Visible"
+                        HorizontalScrollBarVisibility="Disabled"
+                        CanContentScroll="True"
+                        Background="Transparent"
+                        Padding="0,0,10,0">
+
+                        <ScrollViewer.Resources>
+                            <Style TargetType="{x:Type ScrollBar}"
+                                    BasedOn="{StaticResource DarkScrollBar}"/>
+
+                        </ScrollViewer.Resources>
+
+                        <ItemsControl ItemsSource="{Binding Plays}">
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="18"
+                                        Margin="0,0,0,8">
+
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="Background" Value="#20232D"/>
+                                                <Setter Property="BorderBrush" Value="#303440"/>
+
+                                                <Style.Triggers>
+
+                                                    <!-- First down -->
+                                                    <DataTrigger Binding="{Binding Result}" Value="First Down">
+                                                        <Setter Property="BorderBrush" Value="#8B7BC8"/>
+                                                    </DataTrigger>
+
+                                                    <!-- Penalty -->
+                                                    <DataTrigger Binding="{Binding IsPenalty}" Value="True">
+                                                        <Setter Property="Background" Value="#30291F"/>
+                                                        <Setter Property="BorderBrush" Value="#B7791F"/>
+                                                    </DataTrigger>
+
+                                                    <!-- Turnover -->
+                                                    <DataTrigger Binding="{Binding IsTurnover}" Value="True">
+                                                        <Setter Property="Background" Value="#35242B"/>
+                                                        <Setter Property="BorderBrush" Value="#D65A6A"/>
+                                                    </DataTrigger>
+
+                                                    <!-- Scoring play -->
+                                                    <DataTrigger Binding="{Binding IsScoringPlay}" Value="True">
+                                                        <Setter Property="Background" Value="#23382F"/>
+                                                        <Setter Property="BorderBrush" Value="#4ADE80"/>
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="65"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- QUARTER AND CLOCK -->
+                                            <StackPanel Grid.Column="0">
+
+                                                <TextBlock
+                                                    Text="{Binding Quarter}"
+                                                    Foreground="#A78BFA"
+                                                    FontWeight="Bold"
+                                                    FontSize="12"/>
+
+                                                <TextBlock
+                                                    Text="{Binding Clock}"
+                                                    Foreground="{StaticResource MutedBrush}"
+                                                    FontSize="11"
+                                                    Margin="0,3,0,0"/>
+
+                                            </StackPanel>
+
+                                            <!-- PLAY INFORMATION -->
+                                            <StackPanel Grid.Column="1">
+
+                                                <!-- TEAM -->
+                                                <StackPanel
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,0,4">
+
+                                                    <Image
+                                                        Source="{Binding TeamLogoUrl}"
+                                                        Width="22"
+                                                        Height="22"
+                                                        Stretch="Uniform"
+                                                        Margin="0,0,7,0"/>
+
+                                                    <TextBlock
+                                                        Text="{Binding TeamAbbreviation}"
+                                                        Foreground="#A78BFA"
+                                                        FontSize="11"
+                                                        FontWeight="Bold"
+                                                        VerticalAlignment="Center"/>
+
+                                                </StackPanel>
+
+                                                <!-- IMPORTANT PLAY LABEL -->
+                                                <Border
+                                                    CornerRadius="4"
+                                                    Padding="8,4"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="0,0,0,8">
+
+                                                    <Border.Style>
+                                                        <Style TargetType="{x:Type Border}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Setter Property="Background" Value="#302B45"/>
+                                                            <Setter Property="BorderBrush" Value="#8B7BC8"/>
+                                                            <Setter Property="BorderThickness" Value="1"/>
+
+                                                            <Style.Triggers>
+
+                                                                <DataTrigger Binding="{Binding IsImportantPlay}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+
+                                                                <DataTrigger Binding="{Binding IsPenalty}" Value="True">
+                                                                    <Setter Property="Background" Value="#49351F"/>
+                                                                    <Setter Property="BorderBrush" Value="#B7791F"/>
+                                                                </DataTrigger>
+
+                                                                <DataTrigger Binding="{Binding IsTurnover}" Value="True">
+                                                                    <Setter Property="Background" Value="#472B32"/>
+                                                                    <Setter Property="BorderBrush" Value="#D65A6A"/>
+                                                                </DataTrigger>
+
+                                                                <DataTrigger Binding="{Binding IsScoringPlay}" Value="True">
+                                                                    <Setter Property="Background" Value="#23382F"/>
+                                                                    <Setter Property="BorderBrush" Value="#4ADE80"/>
+                                                                </DataTrigger>
+
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+
+                                                    <TextBlock
+                                                        Text="{Binding HighlightLabel}"
+                                                        Foreground="#FFFFFF"
+                                                        FontSize="10"
+                                                        FontWeight="Bold"/>
+
+                                                </Border>
+
+                                                <!-- PLAY DESCRIPTION -->
+                                                <TextBlock
+                                                    Text="{Binding Description}"
+                                                    Foreground="{StaticResource TextBrush}"
+                                                    FontSize="12"
+                                                    TextWrapping="Wrap"
+                                                    Margin="0,4,0,8"/>
+
+                                                <!-- PLAY DETAILS -->
+                                                <WrapPanel Margin="0,0,0,6">
+
+                                                    <!-- PLAY TYPE -->
+                                                    <Border
+                                                        Background="#302B45"
+                                                        CornerRadius="4"
+                                                        Padding="7,3"
+                                                        Margin="0,0,6,5">
+
+                                                        <TextBlock
+                                                            Text="{Binding Type}"
+                                                            Foreground="#C4B5FD"
+                                                            FontSize="10"
+                                                            FontWeight="SemiBold"/>
+
+                                                    </Border>
+
+                                                    <!-- DOWN AND DISTANCE -->
+                                                    <Border
+                                                        Background="#292C38"
+                                                        CornerRadius="4"
+                                                        Padding="7,3"
+                                                        Margin="0,0,6,5">
+
+                                                        <TextBlock
+                                                            Text="{Binding DownDistance}"
+                                                            Foreground="{StaticResource TextBrush}"
+                                                            FontSize="10"/>
+
+                                                    </Border>
+
+                                                    <!-- YARDS GAINED -->
+                                                    <Border
+                                                        Background="#23382F"
+                                                        CornerRadius="4"
+                                                        Padding="7,3"
+                                                        Margin="0,0,6,5">
+
+                                                        <TextBlock
+                                                            Text="{Binding YardsGained, StringFormat={}{0:+#;-#;0} yards}"
+                                                            Foreground="#86EFAC"
+                                                            FontSize="10"
+                                                            FontWeight="SemiBold"/>
+
+                                                    </Border>
+
+                                                    <!-- RESULT -->
+                                                    <Border
+                                                        Background="#292C38"
+                                                        CornerRadius="4"
+                                                        Padding="7,3"
+                                                        Margin="0,0,6,5">
+
+                                                        <TextBlock
+                                                            Text="{Binding Result}"
+                                                            Foreground="{StaticResource TextBrush}"
+                                                            FontSize="10"/>
+
+                                                    </Border>
+
+                                                </WrapPanel>
+
+                                                <!-- FIELD POSITION -->
+                                                <TextBlock
+                                                    Text="{Binding StartFieldPosition}"
+                                                    Foreground="{StaticResource MutedBrush}"
+                                                    FontSize="10"
+                                                    Margin="0,0,0,3"/>
+
+                                                <TextBlock
+                                                    Text="{Binding EndFieldPosition}"
+                                                    Foreground="{StaticResource MutedBrush}"
+                                                    FontSize="10"
+                                                    Margin="0,0,0,6"/>
+
+                                                <!-- SCORE -->
+                                                <WrapPanel>
+
+                                                    <TextBlock
+                                                        Text="{Binding AwayScore}"
+                                                        Foreground="{StaticResource TextBrush}"
+                                                        FontSize="10"/>
+
+                                                    <TextBlock
+                                                        Text=" - "
+                                                        Foreground="{StaticResource MutedBrush}"
+                                                        FontSize="10"/>
+
+                                                    <TextBlock
+                                                        Text="{Binding HomeScore}"
+                                                        Foreground="{StaticResource TextBrush}"
+                                                        FontSize="10"/>
+
+                                                </WrapPanel>
+
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                        </ItemsControl>
+
+                    </ScrollViewer>
+
+                </Grid>
+            </Border>
+
+            <!-- GAME DETAILS SIDEBAR -->
+            <Border Grid.Column="1"
+                    Background="{StaticResource PanelBrush}"
+                    CornerRadius="12"
+                    Padding="18">
+
+                <StackPanel>
+
+                    <!-- Header -->
+                    <TextBlock Text="GAME INFORMATION"
+                               FontWeight="Bold"
+                               FontSize="13"
+                               Margin="0,0,0,20"/>
+
+                    <!-- Quarter -->
+                    <TextBlock Text="QUARTER"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"/>
+
+                    <TextBlock
+                        Text="{Binding SelectedGame.Period, FallbackValue=--, TargetNullValue=--}"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        Margin="0,4,0,18"/>
+
+                    <!-- Game Clock -->
+                    <TextBlock Text="GAME CLOCK"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"/>
+
+                    <TextBlock
+                        Text="{Binding SelectedGame.DisplayClock, FallbackValue=--:--, TargetNullValue=--:--}"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        Margin="0,4,0,18"/>
+
+                    <!-- Possession -->
+                    <TextBlock Text="POSSESSION"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"/>
+
+                    <TextBlock
+                        Text="{Binding GameSituation.PossessionTeam, FallbackValue=--, TargetNullValue=--}"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Margin="0,4,0,18"/>
+
+                    <!-- Down and Distance -->
+                    <TextBlock Text="DOWN &amp; DISTANCE"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"/>
+
+                    <TextBlock
+                        Text="{Binding GameSituation.DownDistance, FallbackValue=--, TargetNullValue=--}"
+                        FontSize="22"
+                        FontWeight="Bold"
+                        Margin="0,4,0,18"/>
+
+                    <!-- Field Position -->
+                    <TextBlock Text="FIELD POSITION"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="10"/>
+
+                    <TextBlock
+                        Text="{Binding GameSituation.FieldPosition, FallbackValue=--, TargetNullValue=--}"
+                        FontSize="15"
+                        Margin="0,4,0,18"/>
+
+                    <!-- Timeout Divider -->
+                    <Separator
+                        Background="{StaticResource BorderBrush}"
+                        Margin="0,5,0,15"/>
+
+                    <!-- Timeouts Header -->
+                    <TextBlock Text="TIMEOUTS REMAINING"
+                               FontWeight="Bold"
+                               FontSize="11"
+                               Margin="0,0,0,12"/>
+
+                    <!-- Away Team Timeouts -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Text="{Binding SelectedGame.AwayTeam.Abbreviation, FallbackValue=AWAY, TargetNullValue=AWAY}"
+                            Foreground="{StaticResource MutedBrush}"
+                            FontSize="11"
+                            VerticalAlignment="Center"/>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Text="{Binding GameSituation.AwayTimeoutsDisplay, FallbackValue=--, TargetNullValue=--}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Home Team Timeouts -->
+                    <Grid Margin="0,0,0,18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Text="{Binding SelectedGame.HomeTeam.Abbreviation, FallbackValue=HOME, TargetNullValue=HOME}"
+                            Foreground="{StaticResource MutedBrush}"
+                            FontSize="11"
+                            VerticalAlignment="Center"/>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            Text="{Binding GameSituation.HomeTimeoutsDisplay, FallbackValue=--, TargetNullValue=--}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Divider -->
+                    <Separator
+                        Background="{StaticResource BorderBrush}"
+                        Margin="0,0,0,15"/>
+
+                    <!-- Game Status -->
+                    <TextBlock Text="GAME STATUS"
+                       Foreground="{StaticResource MutedBrush}"
+                       FontSize="10"/>
+
+                    <TextBlock
+                        Text="{Binding SelectedGame.DisplayStatus, FallbackValue=UNKNOWN, TargetNullValue=UNKNOWN}"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Margin="0,4,0,12"/>
+
+                    <!-- Connection Status -->
+                    <TextBlock
+                        Text="{Binding ConnectionStatus}"
+                        Foreground="{StaticResource MutedBrush}"
+                        FontSize="11"
+                        VerticalAlignment="Center"/>
+
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
